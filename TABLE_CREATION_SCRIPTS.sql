@@ -1,14 +1,12 @@
 -- TABLE CREATION SCRIPTS FOR TELCO PROJECT
+-- This script creates the required tables, constraints, and indexes for the Telco Project.
+-- The tables are designed according to the provided CSV files.
 
--- Drop tables if they already exist.
--- If these tables do not exist yet, Oracle may show an error for these lines.
--- This is normal when running the script for the first time.
+DROP TABLE MONTHLY_STATS CASCADE CONSTRAINTS;
+DROP TABLE CUSTOMERS CASCADE CONSTRAINTS;
+DROP TABLE TARIFFS CASCADE CONSTRAINTS;
 
-DROP TABLE MONTHLY_STATS;
-DROP TABLE CUSTOMERS;
-DROP TABLE TARIFFS;
 
--- TARIFFS table stores tariff/package information.
 CREATE TABLE TARIFFS (
     TARIFF_ID NUMBER PRIMARY KEY,
     NAME VARCHAR2(100) NOT NULL,
@@ -18,7 +16,7 @@ CREATE TABLE TARIFFS (
     SMS_LIMIT NUMBER NOT NULL
 );
 
--- CUSTOMERS table stores customer information.
+
 CREATE TABLE CUSTOMERS (
     CUSTOMER_ID NUMBER PRIMARY KEY,
     NAME VARCHAR2(100) NOT NULL,
@@ -31,9 +29,7 @@ CREATE TABLE CUSTOMERS (
         REFERENCES TARIFFS(TARIFF_ID)
 );
 
--- MONTHLY_STATS table stores monthly usage and payment status information.
--- A foreign key is not added to CUSTOMER_ID here because the sample data IDs
--- in MONTHLY_STATS and CUSTOMERS appear to use different numbering ranges.
+
 CREATE TABLE MONTHLY_STATS (
     ID NUMBER PRIMARY KEY,
     CUSTOMER_ID NUMBER NOT NULL,
@@ -42,11 +38,15 @@ CREATE TABLE MONTHLY_STATS (
     SMS_USAGE NUMBER DEFAULT 0 NOT NULL,
     PAYMENT_STATUS VARCHAR2(20) NOT NULL,
 
+    CONSTRAINT FK_MONTHLY_STATS_CUSTOMERS
+        FOREIGN KEY (CUSTOMER_ID)
+        REFERENCES CUSTOMERS(CUSTOMER_ID),
+
     CONSTRAINT CHK_PAYMENT_STATUS
         CHECK (PAYMENT_STATUS IN ('PAID', 'LATE', 'UNPAID'))
 );
 
--- Indexes for faster searching, filtering, and joining.
+
 CREATE INDEX IDX_CUSTOMERS_TARIFF_ID
 ON CUSTOMERS(TARIFF_ID);
 
